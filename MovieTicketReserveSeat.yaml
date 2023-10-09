@@ -1,0 +1,124 @@
+openapi: 3.0.0
+info:
+  version: "1.0.0"
+  title: Movie Ticket Booking API - Reserve Seat
+  description: API for reserving a seat for a specific showtime.
+paths:
+  /seats:
+    post:
+      summary: Reserve the chosen seat for the choosen showtimeID.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                seatId:
+                  type: integer
+                  description: The seatID needs to be marked reserved.
+              required:
+                - seatId
+      responses:
+        '200':
+          description: Seat reserved successfully. Payment Form sent.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  paymentForm:
+                    type: string
+                    description: seatID marked Reserved. Send the link to the payment form gateway to client.
+        '400':
+          description: Seat reservation failed. Seat might be already reserved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  error:
+                    type: string
+                    description: Error message showing why reservation failed.
+    get:
+      summary: Retrieve the status of a seat (seatID) for the specific showtimeID.
+      parameters:
+        - in: query
+          name: seatId
+          schema:
+            type: integer
+          description: Seat ID to get the current status.
+          required: true
+      responses:
+        '200':
+          description: Successfully retrieved the seatID status.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  seatStatus:
+                    type: string
+        '404':
+          description: Seat not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  error:
+                    type: string
+                    description: Error message showing why the seat was not found.
+    delete:
+      summary: Cancel the reservation of a seat.
+      parameters:
+        - in: query
+          name: seatId
+          schema:
+            type: integer
+          description: SeatID needs to cancel the reservation.
+          required: true
+      responses:
+        '200':
+          description: Seat reservation canceled successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+        '400':
+          description: Seat cancellation failed. Seat might not be reserved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  error:
+                    type: string
+                    description: Error message showing why cancellation failed. The request made by the client was understood, but the server could not process it because the seatID the client is trying to cancel might not be reserved.
+        '404':
+          description: Seat not found for cancellation.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  error:
+                    type: string
+                    description: Error message showing why the seat was not found for cancellation. The request made by the client was understood, but the server could not find the seatID the client is referring to.
